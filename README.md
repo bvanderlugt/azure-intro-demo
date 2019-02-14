@@ -15,6 +15,7 @@
 - [Azure Tags](#azure-tags)
 - [Terraform Backend](#terraform-backend)
 - [Demonstration Manuscript](#demonstration-manuscript)
+- [Instructions for Windows Users](#instructions-for-windows-users)
 - [Suggestions to Continue this Demonstration](#suggestions-to-continue-this-demonstration)
 
 
@@ -67,7 +68,7 @@ In this chapter we walk through the terraform modules a bit deeper.
 
 You can find all parameters related to dev env in file [dev.tf](terraform/envs/dev/dev.tf). Open the file.
 
-This file starts with the provider definition (azure apparently in the case of this Azure demonstration). Then there is the terraform backend configuration. More about it later but let's remind you right away that if you want to deploy this demo to your Azure subscription you have to change the ```storage_account_name```, and the name must be unique in all Azure - so try to figure out some unique name like ```jesse-testing-as-terraform-demo``` etc.
+This file starts with the provider definition (azure apparently in the case of this Azure demonstration). Then there is the terraform backend configuration. More about it later but let's remind you right away that if you want to deploy this demo to your Azure subscription you have to change the ```storage_account_name```, and the name must be unique in all Azure - so try to figure out some unique name like ```jesse-testing-terraform-demo``` etc.
 
 After that we have the terraform locals definition - these are provided for this context and we use them to inject the parameter values to the env-def module which follows right after the locals definition.
 
@@ -130,8 +131,9 @@ After the script has run it prints three important values:
 - access_key: You have to create an environment script which defines ACCOUNT_KEY environment variable - set the value you got as the value of this environment variable. When ever you run terraform commands this environment variable must be defined with the account key value (storage account key) - this way terraform can connect to your terraform backend file which is stored in the Azure [Storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
 
 
-
 # Demonstration Manuscript
+
+NOTE: These instructions are for Linux (most probably should work for Mac as well). Windows instructions are in the next chapter.
 
 Let's finally give detailed demonstration manuscript how you are able to deploy the infra of this demonstration to your Azure subscription. You need an Azure subscription for this demonstration. You can order a private Azure subscription or you can contact your line manager if there is an Azure development subscription in your unit that you can use for self-study purposes to learn how to use Azure. **NOTE**: Watch for costs! Always finally destroy your infrastructure once you are ready (never leave any resources to run indefinitely in your subscription to generate costs).
 
@@ -158,6 +160,11 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
    2. Open another terminal in project root folder.
    3. ssh -i terraform/modules/vm/.ssh/vm_id_rsa ubuntu@IP-NUMBER-HERE
 9. Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
+
+
+# Instructions for Windows Users
+
+**NOTE**: If some Windows guy volunteers to test these instructions using his/her Windows workstation and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter.
 
 
 # Suggestions to Continue this Demonstration
