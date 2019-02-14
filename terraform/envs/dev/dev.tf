@@ -27,13 +27,6 @@ locals {
   my_prefix              = "intro-demo"
   my_env                 = "dev"
   my_location            = "westeurope"
-  vm_ssh_public_key_file = "/home/aw/pc/git/azure-intro-demo/.ssh/vm_id_rsa.pub"
-  application_port       = "3045"
-  # NOTE: The custom image must have been created by Packer previously.
-  vm_image_name          = "intro-vm-image"
-  # Let's keep the image in different resource group than the actual infra, so images preserve if we destroy the actual infra.
-  vm_image_rg_name       = "intro-demo-dev-images-rg"
-  vm_custom_data_file    = "TODO"
   # Choose the address space.
   vnet_address_prefix                       = "10.50.0.0/16"
   private_application_subnet_address_prefix = "10.50.1.0/24"
@@ -49,8 +42,5 @@ module "env-def" {
 
   vnet_address_prefix                       = "${local.vnet_address_prefix}"
   private_application_subnet_address_prefix = "${local.private_application_subnet_address_prefix}"
-  application_port                          = "${local.application_port}"
-  vm_image_name                             = "${local.vm_image_name}"
-  vm_image_rg_name                          = "${local.vm_image_rg_name}"
 }
 

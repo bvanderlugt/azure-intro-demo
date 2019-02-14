@@ -53,14 +53,14 @@ resource "azurerm_subnet_network_security_group_association" "private_applicatio
 }
 
 
-resource "azurerm_network_security_rule" "private_application_subnet_nw_sg" {
-  name = "${local.my_name}-private-application-subnet-nw-sg-allow-http-3045-rule"
-  priority                    = 200
+resource "azurerm_network_security_rule" "private_application_subnet_ssh_22_rule" {
+  name = "${local.my_name}-private-application-subnet-nw-sg-allow-ssh-22-rule"
+  priority                    = 250
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = "3045"
+  destination_port_range      = "22"
   source_address_prefix       = "*"
   destination_address_prefix  = "${var.private_application_subnet_address_prefix}"
   resource_group_name         = "${var.rg_name}"

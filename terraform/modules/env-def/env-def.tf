@@ -21,6 +21,15 @@ module "vnet" {
 
   vnet_address_prefix                       = "${var.vnet_address_prefix}"
   private_application_subnet_address_prefix = "${var.private_application_subnet_address_prefix}"
-  application_port                          = "${var.application_port}"
+}
+
+
+module "vm" {
+  source                        = "../vm"
+  prefix                        = "${var.prefix}"
+  env                           = "${var.env}"
+  location                      = "${var.location}"
+  rg_name                       = "${module.main-resource-group.resource_group_name}"
+  private_application_subnet_id = "${module.vnet.private_application_subnet_id}"
 }
 

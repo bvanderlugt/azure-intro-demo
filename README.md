@@ -89,14 +89,17 @@ You need an Azure subscription for this demonstration. You can order a private A
 8. Open Azure Portal and browse different views to see what entities were created:
    1. TODO.
    2. TODO
-9. Test the demo application by hitting to the load balancer with a http GET: 
-   1. TODO: Get LB DNS here.
-   2. TODO: curl command here.
+9. Test to get ssh connection to the VM:
+   1. terraform output -module=env-def.vm => You get the public ip of the VM.
+   2. Open another terminal in project root folder.
+   3. ssh -i terraform/modules/vm/.ssh/vm_id_rsa ubuntu@IP-NUMBER-HERE
+
 
 
 # Suggestions to Continue this Demonstration
 
 We could add e.g. scale set to this demonstration but let's keep this demonstration as short as possible so that it can be used as an Azure introduction demonstration. If there are some improvement suggestions that our AS developers would like to see in this demonstration let's create other small demonstrations for those purposes, e.g.:
+- Create a custom Linux image that has the Java app baked in.
 - A scale set for VMs.
 - Logs to Log Analytics.
 - Use container instead of VM.
