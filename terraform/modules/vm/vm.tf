@@ -20,6 +20,9 @@ resource "null_resource" "save-ssh-key" {
     key = "${tls_private_key.ssh-key.private_key_pem}"
   }
 
+  # I realized later that this works only when you are able to use some unix like shell.
+  # Probably better to provide another version in which one can create the key
+  # manually and the infra code injects that key to the vm.
   provisioner "local-exec" {
     command = <<EOF
       mkdir -p ${path.module}/.ssh
