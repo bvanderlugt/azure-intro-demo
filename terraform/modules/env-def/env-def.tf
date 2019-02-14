@@ -20,7 +20,7 @@ module "vnet" {
   rg_name         = "${module.main-resource-group.resource_group_name}"
 
   vnet_address_prefix                       = "${var.vnet_address_prefix}"
-  private_application_subnet_address_prefix = "${var.private_application_subnet_address_prefix}"
+  application_subnet_address_prefix = "${var.application_subnet_address_prefix}"
 }
 
 
@@ -30,6 +30,6 @@ module "vm" {
   env                           = "${var.env}"
   location                      = "${var.location}"
   rg_name                       = "${module.main-resource-group.resource_group_name}"
-  private_application_subnet_id = "${module.vnet.private_application_subnet_id}"
+  application_subnet_id = "${module.vnet.application_subnet_id}"
 }
 

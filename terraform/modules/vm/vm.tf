@@ -62,7 +62,7 @@ resource "azurerm_network_interface" "vm_nic" {
 
   ip_configuration {
     name                          = "${local.my_name}-nic-config"
-    subnet_id                     = "${var.private_application_subnet_id}"
+    subnet_id                     = "${var.application_subnet_id}"
     private_ip_address_allocation = "dynamic"
     public_ip_address_id          = "${azurerm_public_ip.vm_pip.id}"
   }

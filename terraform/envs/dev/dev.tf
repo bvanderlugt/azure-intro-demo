@@ -29,7 +29,7 @@ locals {
   my_location            = "westeurope"
   # Choose the address space.
   vnet_address_prefix                       = "10.50.0.0/16"
-  private_application_subnet_address_prefix = "10.50.1.0/24"
+  application_subnet_address_prefix = "10.50.1.0/24"
 }
 
 
@@ -41,6 +41,6 @@ module "env-def" {
   location = "${local.my_location}"
 
   vnet_address_prefix                       = "${local.vnet_address_prefix}"
-  private_application_subnet_address_prefix = "${local.private_application_subnet_address_prefix}"
+  application_subnet_address_prefix = "${local.application_subnet_address_prefix}"
 }
 
