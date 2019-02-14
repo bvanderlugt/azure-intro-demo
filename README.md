@@ -2,6 +2,7 @@
 
 
 # Table of Contents  <!-- omit in toc -->
+- [NOTE - WORK IN PROGRESS!!! I'LL REMOVE THIS NOTE WHEN THIS DEMONSTRATION IS READY!](#note---work-in-progress-ill-remove-this-note-when-this-demonstration-is-ready)
 - [Introduction](#introduction)
 - [Azure Solution](#azure-solution)
 - [Terraform Code](#terraform-code)
@@ -14,6 +15,7 @@
 - [Suggestions to Continue this Demonstration](#suggestions-to-continue-this-demonstration)
 
 
+# NOTE - WORK IN PROGRESS!!! I'LL REMOVE THIS NOTE WHEN THIS DEMONSTRATION IS READY!
 
 # Introduction
 
