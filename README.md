@@ -15,7 +15,7 @@
 - [Azure Tags](#azure-tags)
 - [Terraform Backend](#terraform-backend)
 - [Demonstration Manuscript](#demonstration-manuscript)
-- [Instructions for Windows Users](#instructions-for-windows-users)
+- [Demonstration Manuscript for Windows Users](#demonstration-manuscript-for-windows-users)
 - [Suggestions to Continue this Demonstration](#suggestions-to-continue-this-demonstration)
 
 
@@ -128,7 +128,7 @@ I have provided a bash script to create the Azure Storage account and Blob conta
 After the script has run it prints three important values:
 - storage_account_name: You have to add this value to your [dev.tf](terraform/envs/dev/dev.tf) file into the terraform backend section as the storage_account_name value.
 - container_name: You have to add this value to your [dev.tf](terraform/envs/dev/dev.tf) file into the terraform backend section as the container_name value.
-- access_key: You have to create an environment script which defines ACCOUNT_KEY environment variable - set the value you got as the value of this environment variable. When ever you run terraform commands this environment variable must be defined with the account key value (storage account key) - this way terraform can connect to your terraform backend file which is stored in the Azure [Storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
+- access_key: You have to create an environment script which defines  ARM_ACCESS_KEY environment variable - set the value you got as the value of this environment variable. When ever you run terraform commands this environment variable must be defined with the account key value (storage account key) - this way terraform can connect to your terraform backend file which is stored in the Azure [Storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
 
 
 # Demonstration Manuscript
@@ -139,12 +139,12 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
 
 1. Install [Terraform](https://www.terraform.io/). 
 2. Install [Azure command line interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
-3. Clone this project (git clone...). 
+3. Clone this project: git clone https://github.com/tieto-pc/azure-intro-demo.git
 4. Login to Azure:
    1. ```az login```.
    2. ```az account list --output table``` => Check which Azure accounts you have.
-   3. ```az account set -s \"<your-azure-account-name>\"``` => Set the right azure account. **NOTE**: This is important! Always check which Azure account is your default account so that your demos do not accidentally go to some customer Azure production environment!
-5. Configure the terraform backend. Use script [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) to create a Terraform backend for your project.
+   3. ```az account set -s YOUR-ACCOUNT-ID``` => Set the right azure account. **NOTE**: This is important! Always check which Azure account is your default account so that your demos do not accidentally go to some customer Azure production environment!
+5. Configure the terraform backend. Use script [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) to create a Terraform backend for your project. See more detailed instructions how to configure the backend in Terraform code and how to set the environment variable in chapter "Terraform Backend"
 6. Open console in [dev](terraform/envs/dev) folder. Give commands
    1. ```terraform init``` => Initializes the Terraform backend state.
    2. ```terraform get``` => Gets the terraform modules of this project.
@@ -162,9 +162,53 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
 9. Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
 
 
-# Instructions for Windows Users
+# Demonstration Manuscript for Windows Users
 
-**NOTE**: If some Windows guy volunteers to test these instructions using his/her Windows workstation and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter.
+**NOTE**: If some Windows guy volunteers to test deploying this demonstration using his/her Windows workstation and **native Windows command prompt** (not Git Bash as I used) and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter. 
+
+But until we have better instructions from a Windows specialist I can tell how I tested deploying the infra using (virtual) Windows 10 (NOTE: these are a shortened version of the actual Demonstration Manuscript chapter - read above chapter as well).
+
+1. Install:
+   1.  [Git for Windows](https://git-scm.com/download/win)
+   2.  [Terraform for Windows](https://www.terraform.io/downloads.html)
+   3.  [Azure Command Line Interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+2. With Git for Windows you get a Bash for Git. I'm using it from now on: **Open Git Bash**. Now you have a bash console in Windows. Use Git Bash terminal in the following commands.
+3. Clone this project: git clone https://github.com/tieto-pc/azure-intro-demo.git
+4. Login to Azure:
+   1. ```az login```.
+   2. ```az account list --output table``` => Check which Azure accounts you have.
+   3. ```az account set -s YOUR-ACCOUNT-ID``` => Set the right azure account. **NOTE**: This is important! Always check which Azure account is your default account so that your demos do not accidentally go to some customer Azure production environment!
+5. Configure the terraform backend. Use script [create-azure-storage-account-win-version.sh](scripts/create-azure-storage-account-win-version.sh) to create a Terraform backend for your project. See more detailed instructions how to configure the backend in Terraform code and how to set the environment variable in chapter "Terraform Backend".
+
+Before you continue you have to do stupid Windows change. Git for Bash screws the directory when creating the ssh key and trying to store the private key to local disk. If you are using Git Bash you have to change the [vm.tf](terraform/modules/vm/vm.tf):
+
+```text
+      mkdir -p ${path.module}/.ssh
+      echo "${tls_private_key.ssh-key.private_key_pem}" > ${path.module}/.ssh/${local.my_private_key}
+      chmod 0600 ${path.module}/.ssh/${local.my_private_key}
+=>
+      mkdir .ssh
+      echo "${tls_private_key.ssh-key.private_key_pem}" > .ssh/${local.my_private_key}
+```
+
+... this way the VM gets created but terraform still doesn't store the private key to your Windows workstation local disk, luckily terraform prints the private disk, so you can copy-paste it to file (and figure out the file format).
+
+6. With Git Bash go to [dev](terraform/envs/dev) folder. Hopefully you installed terraform some reasonable directory (I installed in: /c/local/terraform_0.11.11/terraform.exe). Give commands:
+   1. ```/your-path/terraform init``` => Initializes the Terraform backend state.
+   2. ```/your-path/terraform get``` => Gets the terraform modules of this project.
+   3. ```/your-path/terraform plan``` => Gives the plan regarding the changes needed to make to your infra. **NOTE**: always read the plan carefully!
+   4. ```/your-path/terraform apply``` => Creates the delta between the current state in the infrastructure and your new state definition in the Terraform configuration files.
+7. Open Azure Portal and browse different views to see what entities were created:
+   1. Find the resource group.
+   2. Click the vnet. Browse subnets etc.
+   3. Click pip => see the public ip of the VM.
+   4. Click vm => Browse different information regarding the VM, e.g. Networking: here you find the firewall definition for ssh we created earlier.
+8. Test to get ssh connection to the VM:
+   1. terraform output -module=env-def.vm => You get the public ip of the VM. (If you didn't get an ip, run terraform apply again - terraform didn't get the ip to state file in the first round.)
+   2. Open another terminal in project root folder.
+   3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE
+9.  Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
+
 
 
 # Suggestions to Continue this Demonstration

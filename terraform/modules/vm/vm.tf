@@ -23,6 +23,10 @@ resource "null_resource" "save-ssh-key" {
   # I realized later that this works only when you are able to use some unix like shell.
   # Probably better to provide another version in which one can create the key
   # manually and the infra code injects that key to the vm.
+  # NOTE: We cannot use path.module with Git Bash since it fails with path.
+  # Use these lines instead with Git Bash:
+  #    mkdir .ssh
+  #    echo "${tls_private_key.ssh-key.private_key_pem}" > .ssh/${local.my_private_key}
   provisioner "local-exec" {
     command = <<EOF
       mkdir -p ${path.module}/.ssh
