@@ -6,7 +6,7 @@ locals {
 }
 
 
-resource "tls_private_key" "ssh-key" {
+resource "tls_private_key" "vm_ssh_key" {
   algorithm   = "RSA"
 }
 
@@ -15,23 +15,39 @@ resource "tls_private_key" "ssh-key" {
 # I.e. resource occasionally fails the first time.
 # When the resource is succesfull you should see the private key
 # in ./terraform/modules/vm/.ssh folder.
-resource "null_resource" "save-ssh-key" {
+
+# We have two versions since the private ssh key needs to be stored in the local
+# workstation differently in Linux and Windows workstations.
+
+# First the Linux version (my_workstation_is_linux = 1)
+resource "null_resource" "vm_save_ssh_key_linux" {
   triggers {
-    key = "${tls_private_key.ssh-key.private_key_pem}"
+    key = "${tls_private_key.vm_ssh_key.private_key_pem}"
   }
 
-  # I realized later that this works only when you are able to use some unix like shell.
-  # Probably better to provide another version in which one can create the key
-  # manually and the infra code injects that key to the vm.
-  # NOTE: We cannot use path.module with Git Bash since it fails with path.
-  # Use these lines instead with Git Bash:
-  #    mkdir .ssh
-  #    echo "${tls_private_key.ssh-key.private_key_pem}" > .ssh/${local.my_private_key}
   provisioner "local-exec" {
     command = <<EOF
       mkdir -p ${path.module}/.ssh
-      echo "${tls_private_key.ssh-key.private_key_pem}" > ${path.module}/.ssh/${local.my_private_key}
+      echo "${tls_private_key.vm_ssh_key.private_key_pem}" > ${path.module}/.ssh/${local.my_private_key}
       chmod 0600 ${path.module}/.ssh/${local.my_private_key}
+EOF
+  }
+}
+
+
+
+# Then the Windows version (my_workstation_is_linux = 0)
+resource "null_resource" "vm_save_ssh_key_windows" {
+  count = "${1 - var.my_workstation_is_linux}"
+  triggers {
+    key = "${tls_private_key.vm_ssh_key.private_key_pem}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["PowerShell"]
+    command = <<EOF
+      md ${path.module}\\.ssh
+      echo "${tls_private_key.vm_ssh_key.private_key_pem}" > ${path.module}\\.ssh\\${local.my_private_key}
 EOF
   }
 }
@@ -118,7 +134,7 @@ resource "azurerm_virtual_machine" "posvm_vm" {
       # You could also provide some existing key in some path like this:
       // key_data = "${file("${var.vm_ssh_public_key_file}")}"
       # Using some dummy domain.
-      key_data = "${trimspace(tls_private_key.ssh-key.public_key_openssh)} ${local.my_admin_user_name}@azure.com"
+      key_data = "${trimspace(tls_private_key.vm_ssh_key.public_key_openssh)} ${local.my_admin_user_name}@azure.com"
     }
   }
 

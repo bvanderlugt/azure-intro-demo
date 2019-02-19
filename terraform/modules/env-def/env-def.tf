@@ -30,6 +30,7 @@ module "vm" {
   env                           = "${var.env}"
   location                      = "${var.location}"
   rg_name                       = "${module.main-resource-group.resource_group_name}"
-  application_subnet_id = "${module.vnet.application_subnet_id}"
+  application_subnet_id         = "${module.vnet.application_subnet_id}"
+  my_workstation_is_linux       = "${var.my_workstation_is_linux}"
 }
 

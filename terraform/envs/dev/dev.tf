@@ -28,8 +28,11 @@ locals {
   my_env                 = "dev"
   my_location            = "westeurope"
   # Choose the address space.
-  vnet_address_prefix                       = "10.50.0.0/16"
+  vnet_address_prefix               = "10.50.0.0/16"
   application_subnet_address_prefix = "10.50.1.0/24"
+  # Linux or Mac: "1", Windows: "0"
+  # This is a hack related to the way how ssh key is stored differently in Linux vs Windows machines.
+  my_workstation_is_linux   = "1"
 }
 
 
@@ -40,7 +43,8 @@ module "env-def" {
   env      = "${local.my_env}"
   location = "${local.my_location}"
 
-  vnet_address_prefix                       = "${local.vnet_address_prefix}"
+  vnet_address_prefix               = "${local.vnet_address_prefix}"
   application_subnet_address_prefix = "${local.application_subnet_address_prefix}"
+  my_workstation_is_linux           = "${local.my_workstation_is_linux}"
 }
 

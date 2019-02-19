@@ -8,7 +8,7 @@
 - [Terraform File Types](#terraform-file-types)
 - [Terraform Env and Modules](#terraform-env-and-modules)
   - [Env Parameters](#env-parameters)
-  - [Env-dev Module](#env-dev-module)
+  - [Env-def Module](#env-def-module)
   - [Resource-group Module](#resource-group-module)
   - [Vnet Module](#vnet-module)
   - [Vm Module](#vm-module)
@@ -25,9 +25,11 @@
 
 This demonstration has been created for our Application Service unit's purposes to be used in training new cloud specialists who don't need to have any prior knowledge of Azure but who want to start working on Azure projects and building their Azure competence.
 
-This project demonstrates basic aspects how to create cloud infrastructure using code. The actual infra is very simple: just one virtual machine (VM). We create a virtual network ([vnet](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) and an application subnet into which we create the [VM](https://azure.microsoft.com/en-us/services/virtual-machines/). There is also one [security group](https://docs.microsoft.com/en-us/azure/virtual-network/security-overview) in the application subnet that allows inbound traffic only using ssh port 22. The infra creates private/public keys and installs the public key to the VM - you get the private key for trying to connect to the VM once you have deployed the infra.
+This project demonstrates basic aspects how to create cloud infrastructure using code. The actual infra is very simple: just one virtual machine (VM). We create a virtual network ([vnet](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) and an application subnet into which we create the [VM](https://azure.microsoft.com/en-us/services/virtual-machines/). There is also one [security group](https://docs.microsoft.com/en-us/azure/virtual-network/security-overview) in the application subnet that allows inbound traffic only using ssh port 22. The infra creates private/public keys and installs the public key to the VM - you get the private key for connecting to the VM once you have deployed the infra.
 
-I tried to keep this demonstration as simple as possible. The main purpose is not to provide an example how to create a cloud system (e.g. not recommending VMs over containers) but to provide a very simple example of infrastructure code and tooling related creating the infra. I have provided some suggestions how to continue this demonstration at the end of this document - you can also send me email to my corporate email and suggest what kind of Azure or AWS POCs you need in your AS unit - I can help you to create the POCs for your customer meetings.
+I tried to keep this demonstration as simple as possible. The main purpose is not to provide an example how to create a cloud system (e.g. not recommending VMs over containers) but to provide a very simple example of infrastructure code and tooling related creating the infra. I have provided some suggestions how to continue this demonstration at the end of this document - you can also send me email to my corporate email and suggest what kind of Azure or AWS POCs you need in your AS team - I can help you to create the POCs for your customer meetings.
+
+NOTE: There is an equivalent AWS demonstration - [aws-intro-demo](https://github.com/tieto-pc/aws-intro-demo) - compare the terraform code between these AWS and Azure infra implementations and you realize how similar they are.
 
 
 # Azure Solution
@@ -41,7 +43,7 @@ So, the system is extremely simple (for demonstration purposes): Just one applic
 
 # Terraform Code
 
-I am using [Terraform](https://www.terraform.io/) as a [infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code) (IaC) tool. Terraform is very much used both in AWS and Azure side and one of its strenghts compared to cloud native tools (AWS / [CloudFormation](https://aws.amazon.com/cloudformation) and Azure / [ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates)) is that you can use Terraform with many cloud providers, you have to learn just one infra language and syntax, and Terraform language (hcl) is pretty powerful and clear. When deciding the actual infra code tool you should consult the customer if there is some tooling already decided. Otherwise you should evaluate ARM template and Terraform and then decided which one is more appropriate for the needs of your cloud project.
+I am using [Terraform](https://www.terraform.io/) as an [infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code) (IaC) tool. Terraform is very much used both in the AWS and Azure sides and one of its strenghts compared to cloud native tools (AWS / [CloudFormation](https://aws.amazon.com/cloudformation) and Azure / [ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates)) is that you can use Terraform with many cloud providers, you have to learn just one infra language and syntax, and Terraform language (hcl) is pretty powerful and clear. When deciding the actual infra code tool you should consult the customer if there is some tooling already decided. Otherwise you should evaluate ARM template and Terraform and then decide which one is more appropriate for the needs of your Azure cloud project.
 
 If you are new to infrastructure as code (IaC) and terraform specifically let's explain the high level structure of the terraform code first. Project's terraform code is hosted in [terraform](terraform) folder.
 
@@ -73,7 +75,7 @@ This file starts with the provider definition (azure apparently in the case of t
 After that we have the terraform locals definition - these are provided for this context and we use them to inject the parameter values to the env-def module which follows right after the locals definition.
 
 
-## Env-dev Module
+## Env-def Module
 
 All right! In the previous file we injected dev env parameters to the [env-def.tf](terraform/modules/env-def/env-def.tf) module. Open this file now.
 
@@ -84,17 +86,17 @@ So, this environment defition defines three modules: a resource group, virtual n
 
 ## Resource-group Module
 
-The [resource-group](terraform/modules/resource-group) just defines the main resource group that we are using with all resources in this infra. The resource groups are used in the Azure cloud used for providing a view to a set of resources and it is also easy manually to destroy a set of resources just by deleting the resource group.
+The [resource-group](terraform/modules/resource-group) module just defines the main resource group that we are using with all resources in this infra. The resource groups are used in the Azure cloud used for providing a view to a set of resources and it is also easy manually to destroy a set of resources just by deleting the resource group.
 
 ## Vnet Module
 
-The [vnet](terraform/modules/vnet) is a bit longer. First it defines a virtual network (vnet). We inject a [cidr address space](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) for the virtual network. All our resources will be using this address space. Then we define a subnet for making the security group rules easier. 
+The [vnet](terraform/modules/vnet) module is a bit longer. First it defines a virtual network (vnet). We inject a [cidr address space](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) for the virtual network. All our resources will be using this address space. Then we define a subnet for making the security group rules easier. 
 
 After the vnet and subnet we have a security group definition, and then we associate this sg to the subnet. After that we finally have the only rule in this sg - the only inbound traffic that we allow is ssh (port 22).
 
 ## Vm Module
 
-The [vm](terraform/modules/vm) is a also a bit more complex. But let's not be intimidated - I took most of the code from a [Microsoft documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-create-complete-vm). As you can see, you can find infra code examples quite easily in the net - you don't have to invent the wheel again when creating most of the infra code.
+The [vm](terraform/modules/vm) module is a also a bit more complex. But let's not be intimidated - I took most of the code from a [Microsoft documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-create-complete-vm). As you can see, you can find infra code examples quite easily in the net - you don't have to invent the wheel again when creating most of the infra code.
 
 So, in the vm module we first create the ssh keys. I later realized that there is some bash inline scripting here - most possibly won't be working if you run terraform in a Windows box (I must test this myself and make this part a bit simpler e.g. injecting the ssh public key manually here). 
 
@@ -102,17 +104,17 @@ After that we define a public ip (pip) and a virtual network interface card (nic
 
 # Azure Tags
 
-In main resources I have added some tags. 
+In all main resources (that support tagging) I have added some tags. 
 
 - Name: "intro-demo-dev-vnet" - this is the name of the resource.
 - Env: "dev" - this is the env (e.g. dev, qa, perf, prod...)
-- Environment: "intro-demo-dev" - this is the specific environment for a specific infra, i.e. we are running dev for intro-demo.
-- Prefix: "intro-demo" - this is the infra without the env postfix.
+- Environment: "intro-demo-dev" - this is the specific environment for a specific infra, i.e. we are running dev for intro-demo (I realized now that in future demos I might change this tag to "Deployment" not to mix Environment and Env tags).
+- Prefix: "intro-demo" - this is the infra without the env postfix. 
 - Location: "westeurope" - Azure location.
 Terraform: "true" (fixed)
 
 
-If you figure out some consistent tagging system it is easy for you to find resources using tags. Examples:
+If you figure out some consistent tagging system it is easier for you to find resources using tags. Examples:
 
 - Env = "dev" => All resources in all projects which have deployed as "dev".
 - Prefix = "intro-demo" => All intro-demos resources in all envs (dev, perf, qa, prod...)
@@ -137,7 +139,7 @@ NOTE: These instructions are for Linux (most probably should work for Mac as wel
 
 Let's finally give detailed demonstration manuscript how you are able to deploy the infra of this demonstration to your Azure subscription. You need an Azure subscription for this demonstration. You can order a private Azure subscription or you can contact your line manager if there is an Azure development subscription in your unit that you can use for self-study purposes to learn how to use Azure. **NOTE**: Watch for costs! Always finally destroy your infrastructure once you are ready (never leave any resources to run indefinitely in your subscription to generate costs).
 
-1. Install [Terraform](https://www.terraform.io/). 
+1. Install [Terraform](https://www.terraform.io/). You might also like to add Terraform support for your favorite editor (e.g. there is a Terraform extension for VS Code).
 2. Install [Azure command line interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 3. Clone this project: git clone https://github.com/tieto-pc/azure-intro-demo.git
 4. Login to Azure:
@@ -164,40 +166,24 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
 
 # Demonstration Manuscript for Windows Users
 
-**NOTE**: If some Windows guy volunteers to test deploying this demonstration using his/her Windows workstation and **native Windows command prompt** (not Git Bash as I used) and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter. 
-
-But until we have better instructions from a Windows specialist I can tell how I tested deploying the infra using (virtual) Windows 10 (NOTE: these are a shortened version of the actual Demonstration Manuscript chapter - read above chapter as well).
+**NOTE**: If some Windows guy volunteers to test deploying this demonstration using his/her Windows workstation and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter. 
 
 1. Install:
    1.  [Git for Windows](https://git-scm.com/download/win)
-   2.  [Terraform for Windows](https://www.terraform.io/downloads.html)
+   2.  [Terraform for Windows](https://www.terraform.io/downloads.html) + add terraform to your path.
    3.  [Azure Command Line Interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
-2. With Git for Windows you get a Bash for Git. I'm using it from now on: **Open Git Bash**. Now you have a bash console in Windows. Use Git Bash terminal in the following commands.
-3. Clone this project: git clone https://github.com/tieto-pc/azure-intro-demo.git
-4. Login to Azure:
+2. Clone this project: git clone https://github.com/tieto-pc/azure-intro-demo.git
+3. Login to Azure:
    1. ```az login```.
    2. ```az account list --output table``` => Check which Azure accounts you have.
    3. ```az account set -s YOUR-ACCOUNT-ID``` => Set the right azure account. **NOTE**: This is important! Always check which Azure account is your default account so that your demos do not accidentally go to some customer Azure production environment!
-5. Configure the terraform backend. Use script [create-azure-storage-account-win-version.sh](scripts/create-azure-storage-account-win-version.sh) to create a Terraform backend for your project. See more detailed instructions how to configure the backend in Terraform code and how to set the environment variable in chapter "Terraform Backend".
-
-Before you continue you have to do stupid Windows change. Git for Bash screws the directory when creating the ssh key and trying to store the private key to local disk. If you are using Git Bash you have to change the [vm.tf](terraform/modules/vm/vm.tf):
-
-```text
-      mkdir -p ${path.module}/.ssh
-      echo "${tls_private_key.ssh-key.private_key_pem}" > ${path.module}/.ssh/${local.my_private_key}
-      chmod 0600 ${path.module}/.ssh/${local.my_private_key}
-=>
-      mkdir .ssh
-      echo "${tls_private_key.ssh-key.private_key_pem}" > .ssh/${local.my_private_key}
-```
-
-... this way the VM gets created but terraform still doesn't store the private key to your Windows workstation local disk, luckily terraform prints the private disk, so you can copy-paste it to file (and figure out the file format).
-
-6. With Git Bash go to [dev](terraform/envs/dev) folder. Hopefully you installed terraform some reasonable directory (I installed in: /c/local/terraform_0.11.11/terraform.exe). Give commands:
-   1. ```/your-path/terraform init``` => Initializes the Terraform backend state.
-   2. ```/your-path/terraform get``` => Gets the terraform modules of this project.
-   3. ```/your-path/terraform plan``` => Gives the plan regarding the changes needed to make to your infra. **NOTE**: always read the plan carefully!
-   4. ```/your-path/terraform apply``` => Creates the delta between the current state in the infrastructure and your new state definition in the Terraform configuration files.
+4. Configure the terraform backend. Use script [create-azure-storage-account-win-version.sh](scripts/create-azure-storage-account-win-version.sh) to create a Terraform backend for your project. See more detailed instructions how to configure the backend in Terraform code and how to set the environment variable in chapter "Terraform Backend".
+5. Change the ssh key creation to use Windows style: [dev.tf](terraform/envs/dev/dev.tf) change the value of local variable ```my_workstation_is_linux``` from default value "1" (meaning your workstation is linux/mac) to value "0" (meaning your workstation is windows). This is a bit of a hack but needed for storing the private ssh key automatically to your workstation's local disk to make things easier in this demo (no need to create the ssh keys manually and use it in the infra code).
+6. Open console in [dev](terraform/envs/dev) folder. Give commands:
+   1. ```terraform init``` => Initializes the Terraform backend state.
+   2. ```terraform get``` => Gets the terraform modules of this project.
+   3. ```terraform plan``` => Gives the plan regarding the changes needed to make to your infra. **NOTE**: always read the plan carefully!
+   4. ```terraform apply``` => Creates the delta between the current state in the infrastructure and your new state definition in the Terraform configuration files.
 7. Open Azure Portal and browse different views to see what entities were created:
    1. Find the resource group.
    2. Click the vnet. Browse subnets etc.
@@ -206,7 +192,7 @@ Before you continue you have to do stupid Windows change. Git for Bash screws th
 8. Test to get ssh connection to the VM:
    1. terraform output -module=env-def.vm => You get the public ip of the VM. (If you didn't get an ip, run terraform apply again - terraform didn't get the ip to state file in the first round.)
    2. Open another terminal in project root folder.
-   3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE
+   3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE (**TODO**: Here I need some help. I'm not a Windows user so I have no idea how to set the file permissions regarding the private ssh key. Also when trying with ssh client in Windows the ssh client complained about wrong key format - I copy-pasted the content of the ssh key to my Linux and the key worked there just fine. So, I'd appreciate if some Windows user writes this section how to try ssh connection to the EC2 instance.)
 9.  Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
 
 
