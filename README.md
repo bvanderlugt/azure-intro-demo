@@ -1,4 +1,4 @@
-# Azure Short Intro Demonstration For AS Specialists  <!-- omit in toc -->
+# Azure Short Intro Demonstration For Tieto Specialists  <!-- omit in toc -->
 
 
 # Table of Contents  <!-- omit in toc -->
@@ -16,14 +16,14 @@
 - [Terraform Backend](#terraform-backend)
 - [Demonstration Manuscript](#demonstration-manuscript)
 - [Demonstration Manuscript for Windows Users](#demonstration-manuscript-for-windows-users)
-- [Suggestions to Continue this Demonstration](#suggestions-to-continue-this-demonstration)
+- [Suggestions How to Continue this Demonstration](#suggestions-how-to-continue-this-demonstration)
 
 
 
 
 # Introduction
 
-This demonstration has been created for our Application Service unit's purposes to be used in training new cloud specialists who don't need to have any prior knowledge of Azure but who want to start working on Azure projects and building their Azure competence.
+This demonstration can be used in training new cloud specialists who don't need to have any prior knowledge of Azure but who want to start working on Azure projects and building their Azure competence.
 
 This project demonstrates basic aspects how to create cloud infrastructure using code. The actual infra is very simple: just one virtual machine (VM). We create a virtual network ([vnet](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) and an application subnet into which we create the [VM](https://azure.microsoft.com/en-us/services/virtual-machines/). There is also one [security group](https://docs.microsoft.com/en-us/azure/virtual-network/security-overview) in the application subnet that allows inbound traffic only using ssh port 22. The infra creates private/public keys and installs the public key to the VM - you get the private key for connecting to the VM once you have deployed the infra.
 
@@ -195,9 +195,15 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
    3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE (**TODO**: Here I need some help. I'm not a Windows user so I have no idea how to set the file permissions regarding the private ssh key. Also when trying with ssh client in Windows the ssh client complained about wrong key format - I copy-pasted the content of the ssh key to my Linux and the key worked there just fine. So, I'd appreciate if some Windows user writes this section how to try ssh connection to the EC2 instance.)
 9.  Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
 
+**NOTE**: Currently there are two issues with storing the private key in a Windows box: In  [vm.tf](https://github.com/tieto-pc/azure-intro-demo/blob/master/terraform/modules/vm/vm.tf) => "vm_save_ssh_key_linux":
+
+1. We should add a powershell command here to make the private key visible only for the current user (or ssh client does not allow using it (as I did in the Linux side)).
+2. The format of the key file should be stored so that the user shouldn't need to use some editor to fix the encoding. Sami Huhtiniemi kindly provided a workaround for the encoding: Converting SSH-file to Windows-format => Open file vm_id_rsa -file (located inside terraform\envs\dev\.terraform\modules…\..ssh\ using [Notepad++](https://notepad-plus-plus.org/) & convert to UTF-8. I.e. we should be able to store the file in UTF-8 in the first place.
+
+If you give me powershell commands that you have validated yourself deploying this demonstration, and I try to deploy the demonstration with your patch and if the patch really works, you will have an honorary mention in this document providing the Windows wizardry to fix the problem. :-) 
 
 
-# Suggestions to Continue this Demonstration
+# Suggestions How to Continue this Demonstration
 
 We could add e.g. scale set to this demonstration but let's keep this demonstration as short as possible so that it can be used as an Azure introduction demonstration. If there are some improvement suggestions that our AS developers would like to see in this demonstration let's create other small demonstrations for those purposes, e.g.:
 - Create a custom Linux image that has the Java app baked in.
