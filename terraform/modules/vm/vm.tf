@@ -21,6 +21,7 @@ resource "tls_private_key" "vm_ssh_key" {
 
 # First the Linux version (my_workstation_is_linux = 1)
 resource "null_resource" "vm_save_ssh_key_linux" {
+  count = "${var.my_workstation_is_linux}"
   triggers {
     key = "${tls_private_key.vm_ssh_key.private_key_pem}"
   }
