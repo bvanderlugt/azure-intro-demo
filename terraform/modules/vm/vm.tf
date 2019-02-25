@@ -36,8 +36,9 @@ EOF
 }
 
 
-
 # Then the Windows version (my_workstation_is_linux = 0)
+# Solution to store the file in Windows with UTF-8 encoding
+# and fixing the access rights for the file kindly provided by Sami Huhtiniemi.
 resource "null_resource" "vm_save_ssh_key_windows" {
   count = "${1 - var.my_workstation_is_linux}"
   triggers {

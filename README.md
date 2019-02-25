@@ -132,6 +132,18 @@ After the script has run it prints three important values:
 - container_name: You have to add this value to your [dev.tf](terraform/envs/dev/dev.tf) file into the terraform backend section as the container_name value.
 - access_key: You have to create an environment script which defines  ARM_ACCESS_KEY environment variable - set the value you got as the value of this environment variable. When ever you run terraform commands this environment variable must be defined with the account key value (storage account key) - this way terraform can connect to your terraform backend file which is stored in the Azure [Storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
 
+So, in a linux box export:
+
+```bash
+export ARM_ACCESS_KEY="YOUR-AZURE-STORAGE-ACCESS-KEY"
+```
+
+And in a windows box the same (but do not use quotes):
+
+```dos
+set ARM_ACCESS_KEY=YOUR-AZURE-STORAGE-ACCESS-KEY
+```
+
 
 # Demonstration Manuscript
 
@@ -166,7 +178,9 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
 
 # Demonstration Manuscript for Windows Users
 
-**NOTE**: If some Windows guy volunteers to test deploying this demonstration using his/her Windows workstation and converts the [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh) script to bat/powerhell script and writes the Windows instructions in this chapter I promise to give him/her one full hour personal face-to-face Azure training in Keila premises. And honorary mention as the writer of this chapter. 
+**NOTE**: Sami Huhtiniemi kindly provided the solution for this demonstration how to store the private key in [vm.tf](terraform/modules/vm/vm.tf) so that the key is stored with UTF-8 encoding and that the file permissions are set so that ssh client won't complain about unprotected key file. Thanks Sami!
+
+**NOTE**: I appreciate if some Windows guy sends me a pull request for a dos/powershell version of this bash script: [create-azure-storage-account.sh](scripts/create-azure-storage-account.sh)!
 
 1. Install:
    1.  [Git for Windows](https://git-scm.com/download/win)
@@ -192,15 +206,8 @@ Let's finally give detailed demonstration manuscript how you are able to deploy 
 8. Test to get ssh connection to the VM:
    1. terraform output -module=env-def.vm => You get the public ip of the VM. (If you didn't get an ip, run terraform apply again - terraform didn't get the ip to state file in the first round.)
    2. Open another terminal in project root folder.
-   3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE (**TODO**: Here I need some help. I'm not a Windows user so I have no idea how to set the file permissions regarding the private ssh key. Also when trying with ssh client in Windows the ssh client complained about wrong key format - I copy-pasted the content of the ssh key to my Linux and the key worked there just fine. So, I'd appreciate if some Windows user writes this section how to try ssh connection to the EC2 instance.)
+   3. ssh -i YOUR-PATH/vm_id_rsa ubuntu@IP-NUMBER-HERE 
 9.  Finally destroy the infra using ```terraform destroy``` command. Check manually also using Portal that terraform destroyed the resource group (if the resource group is gone all the resources are gone also). **NOTE**: It is utterly important that you always destroy your infrastructure when you don't need it anymore - otherwise the infra will generate costs to you or to your unit.
-
-**NOTE**: Currently there are two issues with storing the private key in a Windows box: In  [vm.tf](terraform/modules/vm/vm.tf) => "vm_save_ssh_key_windows":
-
-1. We should add a powershell command here to make the private key visible only for the current user (or ssh client does not allow using it (as I did in the Linux side)). I couldn't figure out how to do it using some Windows native command line tool (like icalc), so I used Git Bash in Windows and gave command: chmod go-rwx vm_id_rsa
-2. The format of the key file should be stored so that the user shouldn't need to use some editor to fix the encoding. Sami Huhtiniemi kindly provided a workaround for the encoding: Converting SSH-file to Windows-format => Open file vm_id_rsa -file (located inside terraform\envs\dev\.terraform\modules…\..ssh\ using [Notepad++](https://notepad-plus-plus.org/) & convert to UTF-8. I.e. we should be able to store the file in UTF-8 in the first place.
-
-If you give me powershell commands that you have validated yourself deploying this demonstration, and I try to deploy the demonstration with your patch and if the patch really works, you will have an honorary mention in this document providing the Windows wizardry to fix the problem. :-) 
 
 
 # Suggestions How to Continue this Demonstration
