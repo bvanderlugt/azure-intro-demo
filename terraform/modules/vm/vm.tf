@@ -48,7 +48,10 @@ resource "null_resource" "vm_save_ssh_key_windows" {
     interpreter = ["PowerShell"]
     command = <<EOF
       md ${path.module}\\.ssh
-      echo "${tls_private_key.vm_ssh_key.private_key_pem}" > ${path.module}\\.ssh\\${local.my_private_key}
+      [IO.File]::WriteAllLines(("${path.module}\.ssh\${local.my_private_key}"), "${tls_private_key.vm_ssh_key.private_key_pem}")
+      icacls ${path.module}\.ssh\${local.my_private_key} /reset
+      icacls ${path.module}\.ssh\${local.my_private_key} /grant:r "$($env:USERNAME):(R,W)"
+      icacls ${path.module}\.ssh\${local.my_private_key} /inheritance:r
 EOF
   }
 }
