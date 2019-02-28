@@ -70,7 +70,7 @@ In this chapter we walk through the terraform modules a bit deeper.
 
 You can find all parameters related to dev env in file [dev.tf](terraform/envs/dev/dev.tf). Open the file.
 
-This file starts with the provider definition (azure apparently in the case of this Azure demonstration). Then there is the terraform backend configuration. More about it later but let's remind you right away that if you want to deploy this demo to your Azure subscription you have to change the ```storage_account_name```, and the name must be unique in all Azure - so try to figure out some unique name like ```jesse-testing-terraform-demo``` etc.
+This file starts with the provider definition (azure apparently in the case of this Azure demonstration). Then there is the terraform backend configuration. More about it later but let's remind you right away that if you want to deploy this demo to your Azure subscription you have to change the ```storage_account_name```, and the name must be unique in all Azure - so try to figure out some unique name like ```jesse-demo``` etc. (**NOTE**: In Azure side you should keep the prefix rather short since I noticed that there are some restrictions in certain Azure resource names - if you have a long prefix and add the Env and resource name to it you may exceed e.g. some 15 character limit in VM names).
 
 After that we have the terraform locals definition - these are provided for this context and we use them to inject the parameter values to the env-def module which follows right after the locals definition.
 
