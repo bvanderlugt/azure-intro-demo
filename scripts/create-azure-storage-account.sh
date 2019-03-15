@@ -10,9 +10,9 @@ then
   echo "Example: ./create-azure-storage-account.sh westeurope myname-azure-intro-demo-terraform-storage-rg devmynameintrodemoterrastorage dev-myname-intro-demo-terraform-container"
 
   echo "NOTE: Use the following azure cli commands to check the right account and to login to az first:"
-  echo "  az account list --output table                    => Check which Azure accounts you have."
-  echo "  az account set -s \"<your-azure-account-name>\"     => Set the right azure account."
   echo "  az login                                          => Login to azure cli."
+  echo "  az account list --output table                    => Check which Azure accounts you have."
+  echo "  az account set -s \"<your-azure-account-name>\"   => Set the right azure account."
   exit 1
 fi
 
