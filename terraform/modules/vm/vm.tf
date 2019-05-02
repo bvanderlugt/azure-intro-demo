@@ -1,6 +1,6 @@
 locals {
   my_name  = "${var.prefix}-${var.env}-vm"
-  my_env   = "${var.prefix}-${var.env}"
+  my_deployment   = "${var.prefix}-${var.env}"
   my_admin_user_name = "ubuntu"
   my_private_key = "vm_id_rsa"
 }
@@ -68,10 +68,10 @@ resource "azurerm_public_ip" "vm_pip" {
   public_ip_address_allocation = "dynamic"
 
   tags {
-    Name        = "${local.my_name}-pip"
-    Environment = "${local.my_env}"
+    Name        = "${local.my_name}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }
@@ -93,10 +93,10 @@ resource "azurerm_network_interface" "vm_nic" {
   }
 
   tags {
-    Name        = "${local.my_name}-nic"
-    Environment = "${local.my_env}"
+    Name        = "${local.my_name}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }
@@ -145,9 +145,9 @@ resource "azurerm_virtual_machine" "posvm_vm" {
 
   tags {
     Name        = "${local.my_name}"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }

@@ -1,6 +1,6 @@
 locals {
   my_name  = "${var.prefix}-${var.env}-${var.rg_name}"
-  my_env   = "${var.prefix}-${var.env}"
+  my_deployment   = "${var.prefix}-${var.env}"
 }
 
 resource "azurerm_resource_group" "resource-group" {
@@ -9,9 +9,9 @@ resource "azurerm_resource_group" "resource-group" {
 
   tags {
     Name        = "${local.my_name}"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }

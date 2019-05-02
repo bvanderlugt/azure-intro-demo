@@ -1,6 +1,6 @@
 locals {
-  my_name = "${var.prefix}-${var.env}-vnet"
-  my_env = "${var.prefix}-${var.env}"
+  my_name       = "${var.prefix}-${var.env}-vnet"
+  my_deployment = "${var.prefix}-${var.env}"
 }
 
 
@@ -12,9 +12,9 @@ resource "azurerm_virtual_network" "vm-vnet" {
 
   tags {
     Name        = "${local.my_name}"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }
@@ -38,9 +38,9 @@ resource "azurerm_network_security_group" "application_subnet_nw_sg" {
 
   tags {
     Name        = "${local.my_name}"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Location    = "${var.location}"
     Terraform   = "true"
   }
